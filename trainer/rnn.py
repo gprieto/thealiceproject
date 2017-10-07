@@ -3,7 +3,7 @@
 
 
 import argparse
-import pickle # for handling the new data source
+#import pickle # for handling the new data source
 import h5py # for saving the model
 
 from datetime import datetime # for filename conventions
@@ -20,22 +20,23 @@ from tensorflow.python.lib.io import file_io # for better file I/O
 import sys
 
 # Create a function to allow for different training data and other options
-def train_model(train_file='wonderland.txt',
+def train_model(train_file='data/wonderland.txt',
 				job_dir='./tmp/wonderland', **args):
 	# set the logging path for ML Engine logging to Storage bucket
 	logs_path = job_dir + '/logs/' + datetime.now().isoformat()
 	print('Using logs_path located at {}'.format(logs_path))
 
 	# Reading in the pickle file. Pickle works differently with Python 2 vs 3
-	f = file_io.FileIO(train_file, mode='r')
-	if sys.version_info < (3,):
-		data = pickle.load(f)
-	else:
-		data = pickle.load(f, encoding='bytes')
+	#f = file_io.FileIO(train_file, mode='r')
+	#if sys.version_info < (3,):
+	#	data = pickle.load(f)
+	#else:
+	#	data = pickle.load(f, encoding='bytes')
 
 	# load ascii text and covert to lowercase
-	#filename = "wonderland.txt"
-	#raw_text = open(filename).read()
+	fs = open(train_file)
+	data = fs.read()
+	fs.close()
 	raw_text = data.lower()
 
 	# create mapping of unique chars to integers
