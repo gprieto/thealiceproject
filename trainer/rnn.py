@@ -36,7 +36,7 @@ def train_model(train_file='data/wonderland.txt',
 	# load ascii text and covert to lowercase
 	#fs = open(train_file)
 	data = f.read()
-	fs.close()
+	f.close()
 	raw_text = data.lower()
 
 	# create mapping of unique chars to integers
