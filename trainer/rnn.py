@@ -27,15 +27,15 @@ def train_model(train_file='data/wonderland.txt',
 	print('Using logs_path located at {}'.format(logs_path))
 
 	# Reading in the pickle file. Pickle works differently with Python 2 vs 3
-	#f = file_io.FileIO(train_file, mode='r')
+	f = file_io.FileIO(train_file, mode='r')
 	#if sys.version_info < (3,):
 	#	data = pickle.load(f)
 	#else:
 	#	data = pickle.load(f, encoding='bytes')
 
 	# load ascii text and covert to lowercase
-	fs = open(train_file)
-	data = fs.read()
+	#fs = open(train_file)
+	data = f.read()
 	fs.close()
 	raw_text = data.lower()
 
