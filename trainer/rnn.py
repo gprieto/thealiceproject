@@ -21,17 +21,17 @@ import sys
 
 # Create a function to allow for different training data and other options
 def train_model(train_file='wonderland.txt',
-                job_dir='./tmp/wonderland', **args):
-    # set the logging path for ML Engine logging to Storage bucket
-    logs_path = job_dir + '/logs/' + datetime.now().isoformat()
-    print('Using logs_path located at {}'.format(logs_path))
+				job_dir='./tmp/wonderland', **args):
+	# set the logging path for ML Engine logging to Storage bucket
+	logs_path = job_dir + '/logs/' + datetime.now().isoformat()
+	print('Using logs_path located at {}'.format(logs_path))
 
-    # Reading in the pickle file. Pickle works differently with Python 2 vs 3
-    f = file_io.FileIO(train_file, mode='r')
-    if sys.version_info < (3,):
-        data = pickle.load(f)
-    else:
-        data = pickle.load(f, encoding='bytes')
+	# Reading in the pickle file. Pickle works differently with Python 2 vs 3
+	f = file_io.FileIO(train_file, mode='r')
+	if sys.version_info < (3,):
+		data = pickle.load(f)
+	else:
+		data = pickle.load(f, encoding='bytes')
 
 	# load ascii text and covert to lowercase
 	#filename = "wonderland.txt"
@@ -88,17 +88,17 @@ def train_model(train_file='wonderland.txt',
 	model.fit(X, y, epochs=20, batch_size=128, callbacks=callbacks_list)
 
 	# Save the model locally
-    model.save('model.h5')
+	model.save('model.h5')
 
 if __name__ == '__main__':
-    # Parse the input arguments for common Cloud ML Engine options
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-      '--train-file',
-      help='Cloud Storage bucket or local path to training data')
-    parser.add_argument(
-      '--job-dir',
-      help='Cloud storage bucket to export the model and store temp files')
-    args = parser.parse_args()
-    arguments = args.__dict__
-    train_model(**arguments)
+	# Parse the input arguments for common Cloud ML Engine options
+	parser = argparse.ArgumentParser()
+	parser.add_argument(
+	  '--train-file',
+	  help='Cloud Storage bucket or local path to training data')
+	parser.add_argument(
+	  '--job-dir',
+	  help='Cloud storage bucket to export the model and store temp files')
+	args = parser.parse_args()
+	arguments = args.__dict__
+	train_model(**arguments)
