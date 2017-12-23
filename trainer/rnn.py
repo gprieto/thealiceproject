@@ -86,10 +86,28 @@ def train_model(train_file='data/wonderland.txt',
 	callbacks_list = [checkpoint]
 
 	# fit the model
-	model.fit(X, y, epochs=20, batch_size=128, callbacks=callbacks_list)
+	model.fit(X, y, epochs=1, batch_size=128, callbacks=callbacks_list)
 
 	# Save the model locally
 	model.save('model.h5')
+
+	# save the model in Google Cloud Storage
+
+	with tf.Session() as sess2:
+		inputs = {"inputs": tf.saved_model.utils.build_tensor_info(X)}
+		outputs = {"outputs":tf.saved_model.utils.build_tensor_info(y)}
+		signature =tf.saved_model.signature_def_utils.build_signature_def(
+		        inputs=inputs,
+		        outputs=outputs,
+		method_name=tf.saved_model.signature_constants.PREDICT_METHOD_NAME
+		    )
+
+		# save as SavedModel
+		b = tf.saved_model.builder.SavedModelBuilder('gs://'+job_dir+'/mdl')
+		b.add_meta_graph_and_variables(sess2,
+		              [tf.saved_model.tag_constants.SERVING],
+		              signature_def_map={'serving_default': signature})
+		b.save()
 
 if __name__ == '__main__':
 	# Parse the input arguments for common Cloud ML Engine options
