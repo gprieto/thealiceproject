@@ -50,7 +50,7 @@ def train_model(train_file='data/wonderland.txt',
 	print ("Total Vocab: ", n_vocab)
 
 	# prepare the dataset of input to output pairs encoded as integers
-	seq_length = 100
+	seq_length = 20
 	dataX = []
 	dataY = []
 	for i in range(0, n_chars - seq_length, 1):
