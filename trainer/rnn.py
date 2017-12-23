@@ -19,6 +19,8 @@ from keras.utils import np_utils
 from tensorflow.python.lib.io import file_io # for better file I/O
 import sys
 
+import tensorflow as tf
+
 # Create a function to allow for different training data and other options
 def train_model(train_file='data/wonderland.txt',
 				job_dir='./tmp/wonderland', **args):
