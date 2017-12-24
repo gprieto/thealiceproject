@@ -72,6 +72,9 @@ def train_model(train_file='data/wonderland.txt',
     # one hot encode the output variable
     y = np_utils.to_categorical(dataY)
 
+    # set the learning phase constant - fixes the bug when calling predict model using TF serving
+    K.set_learning_phase(False)
+
     # define the LSTM model
     model = Sequential()
     model.add(LSTM(256, input_shape=(X.shape[1], X.shape[2])))
