@@ -95,10 +95,11 @@ def train_model(train_file='data/wonderland.txt',
     # fit the model
     model.fit(X, y, epochs=1, batch_size=128, callbacks=callbacks_list)
 
-    # save the model locally
-    # model.save('model.h5')
+    # save the Keras model in GCS
+    model.save(job_dir+'/KerasModel/model.h5')
 
     # convert model to SavedModel and save to Google Cloud Storage
+    '''
     import tensorflow as tf
 
     inputs = {"inputs": tf.saved_model.utils.build_tensor_info(model.input)}
@@ -119,6 +120,7 @@ def train_model(train_file='data/wonderland.txt',
             signature
         })
     builder.save()
+    '''
 
 if __name__ == '__main__':
     # Parse the input arguments for common Cloud ML Engine options
