@@ -3,10 +3,10 @@
 
 
 import argparse
-#import pickle # for handling the new data source
-import h5py # for saving the model
+# import pickle # for handling the new data source
+import h5py  # for saving the model
 
-from datetime import datetime # for filename conventions
+from datetime import datetime  # for filename conventions
 
 import numpy
 from keras.models import Sequential
@@ -16,10 +16,12 @@ from keras.layers import LSTM
 from keras.callbacks import ModelCheckpoint
 from keras.utils import np_utils
 
-from tensorflow.python.lib.io import file_io # for better file I/O
+from tensorflow.python.lib.io import file_io  # for better file I/O
 import sys
 
 # Create a function to allow for different training data and other options
+
+
 def train_model(train_file='data/wonderland.txt',
                 job_dir='./tmp/wonderland', **args):
     # set the logging path for ML Engine logging to Storage bucket
@@ -28,9 +30,9 @@ def train_model(train_file='data/wonderland.txt',
 
     # Reading in the pickle file. Pickle works differently with Python 2 vs 3
     f = file_io.FileIO(train_file, mode='r')
-    #if sys.version_info < (3,):
+    # if sys.version_info < (3,):
     #   data = pickle.load(f)
-    #else:
+    # else:
     #   data = pickle.load(f, encoding='bytes')
 
     # load ascii text and covert to lowercase
@@ -46,8 +48,8 @@ def train_model(train_file='data/wonderland.txt',
     # summarize the loaded data
     n_chars = len(raw_text)
     n_vocab = len(chars)
-    print ("Total Characters: ", n_chars)
-    print ("Total Vocab: ", n_vocab)
+    print("Total Characters: ", n_chars)
+    print("Total Vocab: ", n_vocab)
 
     # prepare the dataset of input to output pairs encoded as integers
     seq_length = 20
@@ -59,7 +61,7 @@ def train_model(train_file='data/wonderland.txt',
         dataX.append([char_to_int[char] for char in seq_in])
         dataY.append(char_to_int[seq_out])
     n_patterns = len(dataX)
-    print ("Total Patterns: ", n_patterns)
+    print("Total Patterns: ", n_patterns)
 
     # reshape X to be [samples, time steps, features]
     X = numpy.reshape(dataX, (n_patterns, seq_length, 1))
@@ -81,48 +83,49 @@ def train_model(train_file='data/wonderland.txt',
     model.compile(loss='categorical_crossentropy', optimizer='adam')
 
     # define the checkpoint
-    filepath="weights-improvement-{epoch:02d}-{loss:.4f}.hdf5"
-    checkpoint = ModelCheckpoint(filepath, monitor='loss', verbose=1, save_best_only=True, mode='min')
+    filepath = "weights-improvement-{epoch:02d}-{loss:.4f}.hdf5"
+    checkpoint = ModelCheckpoint(
+        filepath, monitor='loss', verbose=1, save_best_only=True, mode='min')
     callbacks_list = [checkpoint]
 
     # fit the model
     model.fit(X, y, epochs=1, batch_size=128, callbacks=callbacks_list)
 
     # save the model locally
-    #model.save('model.h5')
+    # model.save('model.h5')
 
     # convert model to SavedModel and save to Google Cloud Storage
-    from keras import backend as K                                                                                                               
-    import tensorflow as tf 
+    from keras import backend as K
+    import tensorflow as tf
 
-    inputs = {"inputs": model.input}
-    outputs = {"outputs":model.output}
-    signature =tf.saved_model.signature_def_utils.build_signature_def(
-            inputs=inputs,
-            outputs=outputs,
-            method_name=tf.saved_model.signature_constants.PREDICT_METHOD_NAME
-        )
+    inputs = {"inputs": tf.saved_model.utils.build_tensor_info(model.input)}
+    outputs = {"outputs": tf.saved_model.utils.build_tensor_info(model.output)}
+    signature = tf.saved_model.signature_def_utils.build_signature_def(
+        inputs=inputs,
+        outputs=outputs,
+        method_name=tf.saved_model.signature_constants.PREDICT_METHOD_NAME
+    )
 
     # save as SavedModel
-    builder = tf.saved_model.builder.SavedModelBuilder(job_dir+'/SavedModel')                                                                    
-    builder.add_meta_graph_and_variables(                                                                                                        
-    sess=K.get_session(),                                                                                                                    
-    tags=[tf.saved_model.tag_constants.SERVING],                                                                                             
-    signature_def_map={                                                                                                                      
-        tf.saved_model.signature_constants.DEFAULT_SERVING_SIGNATURE_DEF_KEY:                                                                
+    builder = tf.saved_model.builder.SavedModelBuilder(job_dir+'/SavedModel')
+    builder.add_meta_graph_and_variables(
+        sess=K.get_session(),
+        tags=[tf.saved_model.tag_constants.SERVING],
+        signature_def_map={
+            tf.saved_model.signature_constants.DEFAULT_SERVING_SIGNATURE_DEF_KEY:
             signature
-            })                                                                                                                                       
+        })
     builder.save()
 
 if __name__ == '__main__':
     # Parse the input arguments for common Cloud ML Engine options
     parser = argparse.ArgumentParser()
     parser.add_argument(
-      '--train-file',
-      help='Cloud Storage bucket or local path to training data')
+        '--train-file',
+        help='Cloud Storage bucket or local path to training data')
     parser.add_argument(
-      '--job-dir',
-      help='Cloud storage bucket to export the model and store temp files')
+        '--job-dir',
+        help='Cloud storage bucket to export the model and store temp files')
     args = parser.parse_args()
     arguments = args.__dict__
     train_model(**arguments)
