@@ -73,6 +73,7 @@ def train_model(train_file='data/wonderland.txt',
     y = np_utils.to_categorical(dataY)
 
     # set the learning phase constant - fixes the bug when calling predict model using TF serving
+    from keras import backend as K
     K.set_learning_phase(False)
 
     # define the LSTM model
@@ -98,7 +99,6 @@ def train_model(train_file='data/wonderland.txt',
     # model.save('model.h5')
 
     # convert model to SavedModel and save to Google Cloud Storage
-    from keras import backend as K
     import tensorflow as tf
 
     inputs = {"inputs": tf.saved_model.utils.build_tensor_info(model.input)}
